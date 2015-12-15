@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">EvenTo</string>
+    <string name="server_client_id">787427356397-ffqnpo5es1930fhecpt6kb8eki05p1ir.apps.googleusercontent.com</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

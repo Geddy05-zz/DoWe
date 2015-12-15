@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "whatsdoin-1083",
+    "project_number": "787427356397",
+    "name": "DoWe"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787427356397:android:7e8b5e7065be4536",
+        "client_id": "android:com.cal.evento.evento",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.cal.evento.evento"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "787427356397-c9709lkkrlo66q81nc857318do0lb9si.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cal.evento.evento",
+            "certificate_hash": "3144131655E6A02D45A0A29FAFCC5B1F13805ECD"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
