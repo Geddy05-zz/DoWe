@@ -38,21 +38,16 @@ import java.util.Locale;
  * Use the {@link CalendarFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CalendarFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class CalendarFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private View myFragment;
+    private CalendarView calendarView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-    private GoogleApiClient mGoogleApiClient;
-    private static final int RC_SIGN_IN = 9001;
-
 
     private OnFragmentInteractionListener mListener;
 
@@ -81,14 +76,6 @@ public class CalendarFragment extends Fragment implements GoogleApiClient.Connec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
-                .enableAutoManage(this.getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -99,23 +86,8 @@ public class CalendarFragment extends Fragment implements GoogleApiClient.Connec
     @Override
     public void onStart() {
         super.onStart();
-        getView().findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                signIn();
-            }
-        });
         createCal();
     }
-
-    View.OnClickListener myOnlyhandler = new View.OnClickListener() {
-        public void onClick(View v) {
-            switch(v.getId()) {
-                case R.id.sign_in_button:
-                    signIn();
-                    break;
-            }
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -149,37 +121,8 @@ public class CalendarFragment extends Fragment implements GoogleApiClient.Connec
         mListener = null;
     }
 
-    private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i("WeDo", "Connection failed: ConnectionResult.getErrorCode() = "
-                + result.getErrorCode());
-    }
-
-    @Override
-    public void onConnected(Bundle arg0) {
-
-        // Once connected with google api, get the location
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int arg0) {
-        mGoogleApiClient.connect();
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
@@ -196,7 +139,7 @@ public class CalendarFragment extends Fragment implements GoogleApiClient.Connec
 
     public void createCal(){
 
-        CalendarView calendarView = (CalendarView) getView().findViewById(R.id.calendar_view);
+        calendarView = (CalendarView) getView().findViewById(R.id.calendar_view);
 
         calendarView.setFirstDayOfWeek(Calendar.MONDAY);
         calendarView.setIsOverflowDateVisible(true);
@@ -215,17 +158,39 @@ public class CalendarFragment extends Fragment implements GoogleApiClient.Connec
         calendarView.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
             @Override
             public void onMonthChanged(@NonNull Date monthDate) {
+                removeDayView();
+                Calendar cal = Calendar.getInstance(Locale.getDefault());
+                cal.set(monthDate.getYear(),monthDate.getMonth(),monthDate.getDay());
+                calendarView.refreshCalendar(cal);
+                drawDayView(monthDate);
                 SimpleDateFormat df = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
 //                if (null != actionBar)
 //                    actionBar.setTitle(df.format(monthDate));
             }
         });
 
-        final DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
+        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
         Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
         if(null != dayView)
             dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,myIcon);
 //            Toast.makeText(this.getContext(), "Today is: " + dayView.getText().toString() + "/" + calendarView.getCurrentMonth() + "/" +  calendarView.getCurrentYear(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void removeDayView(Date monthDate){
+        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
+        Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
+        if(null != dayView)
+            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+    }
+
+    public void drawDayView(Date monthDate){
+        DayView dayView = calendarView.findViewByDate(new Date(2016,01,12));
+        Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
+        if(null != dayView) {
+            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, myIcon);
+        }else{
+            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        }
     }
 
     /**
