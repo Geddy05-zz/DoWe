@@ -6,13 +6,25 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.cal.evento.evento.dummy.DummyContent;
 import com.cal.evento.evento.dummy.DummyContent.DummyItem;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,6 +65,37 @@ public class EventFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        Bundle parameters = new Bundle();
+//        MyApplication appState = ((MyApplication)getActivity().getApplicationContext());
+//        Long tsLong = System.currentTimeMillis()/1000;
+//        String ts = tsLong.toString();
+        Date cDate = new Date();
+        String ts = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
+        parameters.putString("q","Rotterdam");
+        parameters.putString("type","event");
+        parameters.putString("start_time", ts);
+//        search?q=London&type=event
+        GraphRequestAsyncTask graphRequestAsyncTask = new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "search",
+                parameters,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        try {
+                            JSONArray events = response.getJSONObject().getJSONArray("data");
+                            for (int i = 0; i < events.length() - 1; i++) {
+                                JSONObject event = events.getJSONObject(i);
+                                Log.d("DoWe", "onCompleted:" +event.getString("description"));
+                                int test = 1;
+                            }
+                        } catch (JSONException e) {
+//                            e.printStackTrace();
+                        }
+            /* handle the result */
+                    }
+                }
+        ).executeAsync();
     }
 
     @Override

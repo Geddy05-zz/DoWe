@@ -158,7 +158,7 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
             @Override
             public void onMonthChanged(@NonNull Date monthDate) {
-                removeDayView();
+                removeDayView(monthDate);
                 Calendar cal = Calendar.getInstance(Locale.getDefault());
                 cal.set(monthDate.getYear(),monthDate.getMonth(),monthDate.getDay());
                 calendarView.refreshCalendar(cal);

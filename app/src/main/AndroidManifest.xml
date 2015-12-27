@@ -12,16 +12,20 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name="MyApplication"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name="com.facebook.FacebookActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"
-            android:noHistory="true">
+            android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -31,7 +35,17 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value= "@string/facebook_app_id"/>
+
+        <meta-data
+            android:name="com.parse.APPLICATION_ID"
+            android:value="lyy12L1TFYhO4J8F2sN3j7Y1VTJgr34oGUvJtHw5" />
+        <meta-data
+            android:name="com.parse.CLIENT_KEY"
+            android:value="3ebXmvTUstjhNcagbQIlPRFRljXD748rQG3WFBoA" />
 
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>
