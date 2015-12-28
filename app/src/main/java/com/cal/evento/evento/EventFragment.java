@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cal.evento.evento.Models.FacebookEvents;
 import com.cal.evento.evento.dummy.DummyContent;
 import com.cal.evento.evento.dummy.DummyContent.DummyItem;
 import com.facebook.AccessToken;
@@ -23,8 +24,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 
 /**
@@ -40,6 +45,8 @@ public class EventFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    public List facebookEvents;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -84,15 +91,30 @@ public class EventFragment extends Fragment {
                     public void onCompleted(GraphResponse response) {
                         try {
                             JSONArray events = response.getJSONObject().getJSONArray("data");
+//                            facebookEvents = new FacebookEvents[events.length()];
+                            facebookEvents = new ArrayList();
+                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                             for (int i = 0; i < events.length() - 1; i++) {
                                 JSONObject event = events.getJSONObject(i);
-                                Log.d("DoWe", "onCompleted:" +event.getString("description"));
-                                int test = 1;
+                                String name = event.getString("name");
+                                String description = event.getString("description");
+//                                String start_timeString =  event.getString("start_time");
+//                                Date start_time = format.parse(start_timeString);
+
+                                FacebookEvents newEvent = new FacebookEvents();
+                                newEvent.setName(name);
+                                newEvent.setDescription(description);
+                                JSONObject loc = event.getJSONObject("place");
+                                newEvent.setLocation(loc);
+//                                newEvent.setStart_time(start_time);
+                                facebookEvents.add(newEvent);
                             }
                         } catch (JSONException e) {
 //                            e.printStackTrace();
                         }
             /* handle the result */
+//                        int a = facebookEvents.length;
+                        recyclerView.setAdapter(new FacebookEventsAdapter(facebookEvents,mListener));
                     }
                 }
         ).executeAsync();
@@ -106,7 +128,7 @@ public class EventFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
