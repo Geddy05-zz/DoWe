@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.internal.Utility;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -79,7 +82,6 @@ public class CalendarFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-
         }
     }
 
@@ -170,27 +172,38 @@ public class CalendarFragment extends Fragment {
         });
 
         DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-        Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
+        Drawable circle = drawCircle(getContext(),12,12,R.color.colorAccentBlue);
+        Drawable myIcon = getResources().getDrawable( R.drawable.calendardot );
         if(null != dayView)
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,myIcon);
+            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,circle);
 //            Toast.makeText(this.getContext(), "Today is: " + dayView.getText().toString() + "/" + calendarView.getCurrentMonth() + "/" +  calendarView.getCurrentYear(), Toast.LENGTH_SHORT).show();
     }
 
     public void removeDayView(Date monthDate){
         DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-        Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
         if(null != dayView)
             dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
     }
 
     public void drawDayView(Date monthDate){
-        DayView dayView = calendarView.findViewByDate(new Date(2016,01,12));
-        Drawable myIcon = getResources().getDrawable( R.drawable.ic_menu_gallery );
+        DayView dayView = calendarView.findViewByDate(new Date(2016,02,12));
+        Drawable circle = drawCircle(getContext(),10,10,R.color.colorAccentBlue);
         if(null != dayView) {
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, myIcon);
+            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, circle);
         }else{
             dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
         }
+    }
+
+    public static ShapeDrawable drawCircle (Context context, int width, int height, int color) {
+
+        //////Drawing oval & Circle programmatically /////////////
+
+        ShapeDrawable oval = new ShapeDrawable(new OvalShape());
+        oval.setIntrinsicHeight(height);
+        oval.setIntrinsicWidth(width);
+        oval.getPaint().setColor(context.getResources().getColor(color));
+        return oval;
     }
 
     /**
