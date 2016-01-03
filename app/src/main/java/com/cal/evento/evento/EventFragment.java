@@ -17,6 +17,7 @@ import com.cal.evento.evento.dummy.DummyContent.DummyItem;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphRequestBatch;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Items.
@@ -45,8 +47,9 @@ public class EventFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    public List facebookEvents;
+    public List<FacebookEvents> facebookEvents;
     private RecyclerView recyclerView;
+    private Context mContext;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,6 +72,7 @@ public class EventFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        this.mContext = this.getContext();
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -79,12 +83,14 @@ public class EventFragment extends Fragment {
         Date cDate = new Date();
         String ts = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
         parameters.putString("q","Rotterdam");
-        parameters.putString("type","event");
-        parameters.putString("start_time", ts);
+        parameters.putString("type", "event");
+//        parameters.putString("center","4.481776,51.924216");
+//        parameters.putString("distance","10");
+//        parameters.putString("start_time", ts);
 //        search?q=London&type=event
         GraphRequestAsyncTask graphRequestAsyncTask = new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
-                "search",
+                "/search",
                 parameters,
                 HttpMethod.GET,
                 new GraphRequest.Callback() {
@@ -101,7 +107,8 @@ public class EventFragment extends Fragment {
 //                                String start_timeString =  event.getString("start_time");
 //                                Date start_time = format.parse(start_timeString);
 
-                                FacebookEvents newEvent = new FacebookEvents();
+                                String id = event.getString("id");
+                                FacebookEvents newEvent = new FacebookEvents(id);
                                 newEvent.setName(name);
                                 newEvent.setDescription(description);
                                 JSONObject loc = event.getJSONObject("place");
@@ -114,7 +121,8 @@ public class EventFragment extends Fragment {
                         }
             /* handle the result */
 //                        int a = facebookEvents.length;
-                        recyclerView.setAdapter(new FacebookEventsAdapter(facebookEvents,mListener));
+                        recyclerView.setAdapter(new FacebookEventsAdapter(mContext,facebookEvents,mListener));
+                        getExtraEventInfo();
                     }
                 }
         ).executeAsync();
@@ -157,13 +165,66 @@ public class EventFragment extends Fragment {
         mListener = null;
     }
 
+    public void getExtraEventInfo(){
+//        GraphRequest[] req = new GraphRequest[facebookEvents.size()];
+        GraphRequestBatch batch = new GraphRequestBatch();
+        Bundle parameters = new Bundle();
+//        MyApplication appState = ((MyApplication)getActivity().getApplicationContext());
+//        Long tsLong = System.currentTimeMillis()/1000;
+//        String ts = tsLong.toString();
+//        Date cDate = new Date();
+//        String ts = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
+        parameters.putString("fields","cover");
+
+        for (int i = 0; i < facebookEvents.size() - 1; i++) {
+            final FacebookEvents event = facebookEvents.get(i);
+            final int index = i;
+
+            GraphRequest req = new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/"+ event.getiD()+"",
+                    parameters,
+                    HttpMethod.GET,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
+                            /* handle the result */
+                            JSONObject events = response.getJSONObject();
+                            try {
+                                JSONObject json = events.getJSONObject("cover");
+                                String pic = json.getString("source");
+                                event.setPhoto(pic);
+                                facebookEvents.set(index,event);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+            );
+            batch.add(req);
+        }
+
+//        GraphRequestBatch batch = new GraphRequestBatch();
+        batch.addCallback(new GraphRequestBatch.Callback() {
+            @Override
+            public void onBatchCompleted(GraphRequestBatch graphRequests) {
+                // Application code for when the batch finishes
+                int a = 1;
+                recyclerView.setAdapter(new FacebookEventsAdapter(mContext,facebookEvents,mListener));
+
+            }
+        });
+        batch.executeAsync();
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
      * <p/>
-     * See the Android Training lesson <a href=
+     * See the Android Training lesson <a href=11111
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */

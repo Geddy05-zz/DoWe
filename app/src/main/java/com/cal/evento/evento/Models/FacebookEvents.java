@@ -10,10 +10,28 @@ import java.util.Date;
  */
 public class FacebookEvents {
 
+    private String iD;
     private String name;
     private String description;
     private Date start_time;
     private Location location;
+    private String photo;
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public FacebookEvents(String id){
+        this.iD = id;
+    }
+
+    public String getiD(){
+        return iD;
+    }
 
     public void setName(String name){
         this.name = name;
