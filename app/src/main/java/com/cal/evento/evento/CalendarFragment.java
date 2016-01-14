@@ -12,11 +12,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.facebook.internal.Utility;
 import com.google.android.gms.auth.api.Auth;
@@ -25,8 +28,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.samsistemas.calendarview.widget.CalendarView;
-import com.samsistemas.calendarview.widget.DayView;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -46,7 +51,7 @@ public class CalendarFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private CalendarView calendarView;
+    private MaterialCalendarView calendarView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -88,7 +93,8 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        createCal();
+        cal();
+//        createCal();
     }
 
     @Override
@@ -139,61 +145,78 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    public void createCal(){
-
-        calendarView = (CalendarView) getView().findViewById(R.id.calendar_view);
-
-        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
-        calendarView.setIsOverflowDateVisible(true);
-        calendarView.setCurrentDay(new Date(System.currentTimeMillis()));
-        calendarView.setBackButtonColor(R.color.white);
-        calendarView.setNextButtonColor(R.color.white);
-        calendarView.refreshCalendar(Calendar.getInstance(Locale.getDefault()));
-        calendarView.setOnDateSelectedListener(new CalendarView.OnDateSelectedListener() {
+    public void cal(){
+        calendarView = (MaterialCalendarView) getView().findViewById(R.id.calendarView);
+        calendarView.setTopbarVisible(false);
+        Date date = new Date();
+        calendarView.setCurrentDate(date);
+        calendarView.setSelectedDate(date);
+        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
-            public void onDateSelected(@NonNull Date selectedDate) {
-//                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-//                textView.setText(df.format(selectedDate));
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Januari");
             }
         });
 
-        calendarView.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
-            @Override
-            public void onMonthChanged(@NonNull Date monthDate) {
-                removeDayView(monthDate);
-                Calendar cal = Calendar.getInstance(Locale.getDefault());
-                cal.set(monthDate.getYear(),monthDate.getMonth(),monthDate.getDay());
-                calendarView.refreshCalendar(cal);
-                drawDayView(monthDate);
-                SimpleDateFormat df = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-//                if (null != actionBar)
-//                    actionBar.setTitle(df.format(monthDate));
-            }
-        });
-
-        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-        Drawable circle = drawCircle(getContext(),12,12,R.color.colorAccentBlue);
-        Drawable myIcon = getResources().getDrawable( R.drawable.calendardot );
-        if(null != dayView)
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,circle);
-//            Toast.makeText(this.getContext(), "Today is: " + dayView.getText().toString() + "/" + calendarView.getCurrentMonth() + "/" +  calendarView.getCurrentYear(), Toast.LENGTH_SHORT).show();
     }
 
-    public void removeDayView(Date monthDate){
-        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-        if(null != dayView)
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-    }
 
-    public void drawDayView(Date monthDate){
-        DayView dayView = calendarView.findViewByDate(new Date(2016,02,12));
-        Drawable circle = drawCircle(getContext(),10,10,R.color.colorAccentBlue);
-        if(null != dayView) {
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, circle);
-        }else{
-            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-        }
-    }
+
+//    public void createCal(){
+//
+//        calendarView = (CalendarView) getView().findViewById(R.id.calendarView);
+//
+//        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
+//        calendarView.setIsOverflowDateVisible(true);
+//        calendarView.setCurrentDay(new Date(System.currentTimeMillis()));
+//        calendarView.setBackButtonColor(R.color.white);
+//        calendarView.setNextButtonColor(R.color.white);
+//        calendarView.refreshCalendar(Calendar.getInstance(Locale.getDefault()));
+//        calendarView.setOnDateSelectedListener(new CalendarView.OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(@NonNull Date selectedDate) {
+////                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+////                textView.setText(df.format(selectedDate));
+//            }
+//        });
+//
+//        calendarView.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
+//            @Override
+//            public void onMonthChanged(@NonNull Date monthDate) {
+//                removeDayView(monthDate);
+//                Calendar cal = Calendar.getInstance(Locale.getDefault());
+//                cal.set(monthDate.getYear(),monthDate.getMonth(),monthDate.getDay());
+//                calendarView.refreshCalendar(cal);
+//                drawDayView(monthDate);
+//                SimpleDateFormat df = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+////                if (null != actionBar)
+////                    actionBar.setTitle(df.format(monthDate));
+//            }
+//        });
+//
+//        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
+//        Drawable circle = drawCircle(getContext(),12,12,R.color.colorAccentBlue);
+//        Drawable myIcon = getResources().getDrawable( R.drawable.calendardot );
+//        if(null != dayView)
+//            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,circle);
+////            Toast.makeText(this.getContext(), "Today is: " + dayView.getText().toString() + "/" + calendarView.getCurrentMonth() + "/" +  calendarView.getCurrentYear(), Toast.LENGTH_SHORT).show();
+//    }
+//
+//    public void removeDayView(Date monthDate){
+//        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
+//        if(null != dayView)
+//            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
+//    }
+//
+//    public void drawDayView(Date monthDate){
+//        DayView dayView = calendarView.findViewByDate(new Date(2016,02,12));
+//        Drawable circle = drawCircle(getContext(),10,10,R.color.colorAccentBlue);
+//        if(null != dayView) {
+//            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, circle);
+//        }else{
+//            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+//        }
+//    }
 
     public static ShapeDrawable drawCircle (Context context, int width, int height, int color) {
 

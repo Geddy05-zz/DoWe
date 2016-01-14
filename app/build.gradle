@@ -45,6 +45,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'com.parse:parsefacebookutils-v4-android:1.10.3@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.prolificinteractive:material-calendarview:1.+'
     compile('com.google.api-client:google-api-client-android:1.20.0') {
         exclude group: 'org.apache.httpcomponents'
     }

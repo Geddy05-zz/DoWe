@@ -5,14 +5,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".CalendarFragment">
 
-    <com.samsistemas.calendarview.widget.CalendarView
-        android:id="@+id/calendar_view"
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:titleLayoutBackgroundColor="@color/colorPrimary"
-        app:calendarTitleTextColor="@color/white"
-        app:currentDayOfMonthColor="@color/white"
-        app:selectedDayBackgroundColor="@color/colorPrimary"
+        android:layout_height="300dp"
+        android:layout_weight = "1"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:mcv_showOtherDates="all"
+        app:mcv_arrowColor= "@color/colorPrimary"
+        app:mcv_selectionColor="@color/colorPrimary"
         />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="206dp"
+        android:layout_weight = "0.5"
+        android:id="@+id/listView"
+        android:layout_gravity="center_horizontal|bottom" />
 
 </FrameLayout>
