@@ -21,21 +21,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.facebook.internal.Utility;
-import com.google.android.gms.auth.api.Auth;
+import com.cal.evento.evento.Models.EventDecorator;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.model.Event;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -52,6 +54,9 @@ public class CalendarFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private MaterialCalendarView calendarView;
+    private List<Event> calendarEvents;
+    ArrayList<CalendarDay> dates = new ArrayList<>();
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -63,14 +68,6 @@ public class CalendarFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CalendarFragment.
-     */
     // TODO: Rename and change types and number of parameters
     public static CalendarFragment newInstance(String param1, String param2) {
         CalendarFragment fragment = new CalendarFragment();
@@ -93,8 +90,33 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        Calendar mCalendar = Calendar.getInstance();
+        String month = mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(month);
+        this.calendarEvents = ((MainActivity)getActivity()).calendarEvents;
         cal();
+        createCaldays();
+
 //        createCal();
+    }
+
+    public void createCaldays(){
+        if (calendarEvents != null) {
+            for (Event event : calendarEvents) {
+                Log.e("DOWE", event.getStart().getDateTime().toString());
+
+                    String dateTime = event.getStart().getDateTime().toString();
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                try {
+                    Date date = dateFormat.parse(dateTime);
+                    CalendarDay day = CalendarDay.from(date);
+                    dates.add(day);
+                }catch (Exception e){}
+
+            }
+            calendarView.addDecorator(new EventDecorator(0, dates));
+        }
     }
 
     @Override
@@ -150,73 +172,28 @@ public class CalendarFragment extends Fragment {
         calendarView.setTopbarVisible(false);
         Date date = new Date();
         calendarView.setCurrentDate(date);
+
         calendarView.setSelectedDate(date);
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Januari");
+
             }
         });
+        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                date.getCalendar();
 
+                Calendar mCalendar = date.getCalendar();
+                String month = mCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(month);
+            }
+        });
     }
 
-
-
-//    public void createCal(){
 //
-//        calendarView = (CalendarView) getView().findViewById(R.id.calendarView);
-//
-//        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
-//        calendarView.setIsOverflowDateVisible(true);
-//        calendarView.setCurrentDay(new Date(System.currentTimeMillis()));
-//        calendarView.setBackButtonColor(R.color.white);
-//        calendarView.setNextButtonColor(R.color.white);
-//        calendarView.refreshCalendar(Calendar.getInstance(Locale.getDefault()));
-//        calendarView.setOnDateSelectedListener(new CalendarView.OnDateSelectedListener() {
-//            @Override
-//            public void onDateSelected(@NonNull Date selectedDate) {
-////                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-////                textView.setText(df.format(selectedDate));
-//            }
-//        });
-//
-//        calendarView.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
-//            @Override
-//            public void onMonthChanged(@NonNull Date monthDate) {
-//                removeDayView(monthDate);
-//                Calendar cal = Calendar.getInstance(Locale.getDefault());
-//                cal.set(monthDate.getYear(),monthDate.getMonth(),monthDate.getDay());
-//                calendarView.refreshCalendar(cal);
-//                drawDayView(monthDate);
-//                SimpleDateFormat df = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-////                if (null != actionBar)
-////                    actionBar.setTitle(df.format(monthDate));
-//            }
-//        });
-//
-//        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-//        Drawable circle = drawCircle(getContext(),12,12,R.color.colorAccentBlue);
-//        Drawable myIcon = getResources().getDrawable( R.drawable.calendardot );
-//        if(null != dayView)
-//            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,circle);
-////            Toast.makeText(this.getContext(), "Today is: " + dayView.getText().toString() + "/" + calendarView.getCurrentMonth() + "/" +  calendarView.getCurrentYear(), Toast.LENGTH_SHORT).show();
-//    }
-//
-//    public void removeDayView(Date monthDate){
-//        DayView dayView = calendarView.findViewByDate(new Date(System.currentTimeMillis()));
-//        if(null != dayView)
-//            dayView.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-//    }
-//
-//    public void drawDayView(Date monthDate){
-//        DayView dayView = calendarView.findViewByDate(new Date(2016,02,12));
-//        Drawable circle = drawCircle(getContext(),10,10,R.color.colorAccentBlue);
-//        if(null != dayView) {
-//            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, circle);
-//        }else{
-//            dayView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-//        }
-//    }
 
     public static ShapeDrawable drawCircle (Context context, int width, int height, int color) {
 
